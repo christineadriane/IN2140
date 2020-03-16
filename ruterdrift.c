@@ -5,8 +5,9 @@ struct router{
   unsigned char flag;
   unsigned char mLenght;
   char model[248];
-  int *n; // Naboer
+
   int nCounter; // Antall naboer
+  struct router* nList[10];
 };
 
 struct router** routerPointer;
@@ -25,9 +26,8 @@ int main(int argc, char const *argv[]) {
   routerPointer = malloc((sizeof(struct router*)) * routers); //8 * routers byte
 
   for (int i = 0; i < routers; i++){
-    read(myFile, i, routerPointer);
+    read(myFile, i);
   }
-
 
   // Tester innlesing av øvrig infoblokker
   read_connections(myFile);
@@ -48,37 +48,28 @@ int main(int argc, char const *argv[]) {
   fclose(myFile);
 }
 
-// Funker nå som den skal, liten utfordring med print av modell
-void read(FILE *myFile, int n, struct router** routerPointer){
+// innlesing til struct
+void read(FILE *myFile, int n){
   // Hjelpepekere
-  unsigned int id;
-  unsigned char flag;
-  unsigned char mLenght;
-  unsigned int lastBit = 1;
+  //unsigned int id;
+  //unsigned char flag;
+  //unsigned char mLenght;
 
-  fread(&id, sizeof(int), 1, myFile);
-  fread(&flag, sizeof(char), 1, myFile);
-  fread(&mLenght, sizeof(char), 1, myFile);
+  struct router* rp = malloc(sizeof(struct router)); //256
 
-  char model[mLenght];
-  fread(model, mLenght, 1, myFile);
-  fread(&lastBit, sizeof(char), 1, myFile);
+  fread(&rp -> id, sizeof(int), 1, myFile);
+  fread(&rp -> flag, sizeof(char), 1, myFile);
+  fread(&rp -> mLenght, sizeof(char), 1, myFile);
+  fread(&rp -> model, rp -> mLenght + 1, 1, myFile);
 
-  struct router* rp = malloc(sizeof(struct router)); //256 (er det pluss peker-størrelse?)
+  //rp -> id = id;
+  //rp -> flag = flag;
+  //rp -> mLenght = mLenght;
 
-  rp -> id = id;
-  rp -> flag = flag;
-  rp -> mLenght = mLenght;
-  memcpy(rp -> model, model, mLenght);
-
-  for (int i = 0; i < mLenght; i++){
-    printf("%c", rp->model[i]);
-  }
-  printf("\n");
-
-  printf("ID: %d\n", id);
-  printf("Flag: %d\n", flag);
-  printf("Lengde: %d\n", mLenght);
+  printf("Model: %s\n", rp -> model);
+  printf("ID: %d\n", rp -> id);
+  printf("Flag: %d\n", rp -> flag);
+  printf("Lengde: %d\n", rp -> mLenght);
   printf("\n");
 }
 
@@ -92,14 +83,21 @@ void read_connections(FILE* myFile){
   long end = ftell(myFile);
   fseek(myFile, start, SEEK_SET);
 
+  struct router* np = malloc(sizeof(struct router*) * 10);
+
   while(ftell(myFile) != end){
     fread(&r1, sizeof(int), 1, myFile);
     fread(&r2, sizeof(int), 1, myFile);
     fread(&nullByte, 1, 1, myFile);
     printf("%d\n", r1);
     printf("%d\n", r2);
+    np->nCounter ++;
   }
+  printf("\nAntall koblinger: %d\n", np->nCounter);
 }
+
+
+
 /*
 void make_connection(struct router** routerPointer, int from, int to){
   if (rp->n == NULL){
