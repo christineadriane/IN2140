@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // Tester innlesing av øvrig infoblokker
-  read_connections(myFile);
+  read_connections(myFile, routers);
 
   fclose(myFile);
 
@@ -50,10 +50,6 @@ int main(int argc, char const *argv[]) {
 
 // innlesing til struct
 void read(FILE *myFile, int n){
-  // Hjelpepekere
-  //unsigned int id;
-  //unsigned char flag;
-  //unsigned char mLenght;
 
   struct router* rp = malloc(sizeof(struct router)); //256
 
@@ -62,10 +58,6 @@ void read(FILE *myFile, int n){
   fread(&rp -> mLenght, sizeof(char), 1, myFile);
   fread(&rp -> model, rp -> mLenght + 1, 1, myFile);
 
-  //rp -> id = id;
-  //rp -> flag = flag;
-  //rp -> mLenght = mLenght;
-
   printf("Model: %s\n", rp -> model);
   printf("ID: %d\n", rp -> id);
   printf("Flag: %d\n", rp -> flag);
@@ -73,7 +65,7 @@ void read(FILE *myFile, int n){
   printf("\n");
 }
 
-void read_connections(FILE* myFile){
+void read_connections(FILE* myFile, int routers){
   unsigned int r1;
   unsigned int r2;
   unsigned int nullByte;
@@ -93,13 +85,16 @@ void read_connections(FILE* myFile){
     printf("%d\n", r2);
     np->nCounter ++;
   }
+
   printf("\nAntall koblinger: %d\n", np->nCounter);
-}
 
-
-
-/*
-void make_connection(struct router** routerPointer, int from, int to){
-  if (rp->n == NULL){
+  /*
+  for(int i = 0; i < routers; i++){
+    if (routerPointer[i] != NULL){
+      if (routerPointer[i]->id == r1){
+        r1 -> nList[nCounter];
+      }
+    }
   }
-*/
+  */
+}
