@@ -32,6 +32,9 @@ int main(int argc, char const *argv[]) {
   // Tester innlesing av øvrig infoblokker
   read_connections(myFile, routers);
 
+  // !!Segmentation fault!!
+  find_router(routers, 0);
+
   fclose(myFile);
 
   // Start reading argv[2]
@@ -87,6 +90,7 @@ void read_connections(FILE* myFile, int routers){
   }
 
   printf("\nAntall koblinger: %d\n", np->nCounter);
+}
 
   /*
   for(int i = 0; i < routers; i++){
@@ -97,4 +101,17 @@ void read_connections(FILE* myFile, int routers){
     }
   }
   */
+
+
+struct router* find_router(int routers, int id){
+  for(int i = 0; i < routers; i++){
+    if(routerPointer[i] != NULL){
+      if(routerPointer[i]->id == id){
+        return routerPointer[i];
+        printf("sneik\n");
+      }
+    }
+  }
+  return NULL;
+  printf("usnel\n");
 }

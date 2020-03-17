@@ -9,5 +9,6 @@
 /* declarations */
 void read();
 void read_connections();
+struct router* find_router();
 
 #endif

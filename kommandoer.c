@@ -37,7 +37,7 @@ void set_model(int routers, int id, char* name){
   for (int i = 0; i < routers; i++){
     if(routerPointer[i] -> id == id){
       memcpy(routerPointer[i]->model, name, strlen(name));
-      routerPointer[i]->strlen = strlen(name);  
+      routerPointer[i]->strlen = strlen(name);
     }
   }
 }
@@ -48,4 +48,19 @@ void add_connection(int routers, int id){
 
 void finnes_rute(int routers, int id){
 
+}
+
+
+// Free Memory - free allocated memory to avoid leaks
+// int* numRouters:	Number of routers
+int free(int routers) {
+  for(int i = 0; i < routers; i++) {
+    struct router* r = routers[i];
+      if (r != NULL) {
+        free(r); // Free 256 Bytes
+        r = NULL;
+      }
+    }
+    free(routers); // Free routers * 8 Bytes
+    return 0;
 }
