@@ -3,56 +3,71 @@ Forsøk på kommandoer når resten virker
 */
 
 /*
-print ruter-ID : Skriver ut til stdout informasjon on ruteren og ID-ene til dens naboer, nærmere
-bestemt bare de naboene som ruteren peker til.
+print ruter-ID : Skriver ut til stdout informasjon on ruteren og ID-ene til dens naboer, nærmere bestemt bare de naboene som ruteren peker til.
 */
 
+// Ferdig kommando, printe bitwise?
+// Gjør det ved overskudd
 void print(int routers, int id){
-  for(int i = 0; i < routers; i++){
-    if(routerPointer[i]->id == id){
-      printf("Model: %s\n", routerPointer[i]-> model);
-      printf("ID: %d\n", routerPointer[i] -> id );
-      printf("Flag: %d\n", routerPointer[i] -> flag);
+  if (find_router(routers, id) == NULL){
+    printf("Router: %d does not exist.\n", id);
+    return;
+  }
 
-      // Usikker på denne
-      printf("Neighbours:\n");
-      for(int j = 0; j <= 10; j++){
-        if(nList[j] != NULL){
-          printf("%d\n", nList[j]);
-        }
-      }
-    }
+  struct router* routerPointer = find_router(routers, id);
+  printf("Model: %s\n", routerPointer-> model);
+  printf("ID: %d\n", routerPointer -> id );
+  printf("Flag: %d\n", routerPointer -> flag);
+
+  // Finner naboer i nList og printer id og modell
+  for(int i = 0; i < routerPointer->nCounter; i++){
+    printf("Router: %d\n Model: %s\n", routerPointer-> nList[i]->id, routerPointer->nList[i]->model);
   }
 }
 
-void delete(int routers, int id){
-
-}
 
 void set_flag(int id, int position, int value){
-
-}
-
-void set_model(int routers, int id, char* name){
-  for (int i = 0; i < routers; i++){
-    if(routerPointer[i] -> id == id){
-      memcpy(routerPointer[i]->model, name, strlen(name));
-      routerPointer[i]->strlen = strlen(name);
-    }
+  if (find_router(routers, id) == NULL){
+    printf("Router: %d does not exist.\n", id);
+    return;
   }
 }
 
-void add_connection(int routers, int id){
-
-}
 
 void finnes_rute(int routers, int id){
 
 }
 
 
+
+
+// Ferdig kommando. Satt inn i hovedfil
+// Sett modell
+void set_model(int routers, int id, char* name){
+  if (find_router(routers, id) == NULL){
+    printf("Router: %d does not exist.\n", id);
+    return;
+  }
+  struct router* routerPointer = find_router(routers, id);
+  strcpy(routerPointer->model, name);
+  routerPointer -> mLenght = strlen(name)+1;
+}
+
+// Ferdig kommando. Satt inn i hovedfil
+// Legg til kobling
+void add_connection(int routers, int id, int id2){
+  if (find_router(routers, id) == NULL){
+    printf("Router: %d does not exist.\n", id);
+    return;
+  }
+  struct router* r1 = (find_router(routers, id));
+  struct router* r2 = (find_router(routers, id2));
+  r1->nList[r1->nCounter+1] = r2;
+  r1->nCounter++;
+}
+
 // Free Memory - free allocated memory to avoid leaks
-// int* numRouters:	Number of routers
+// satt inn i hovedfil
 int free(int routers) {
   for(int i = 0; i < routers; i++) {
     struct router* r = routers[i];
@@ -64,3 +79,36 @@ int free(int routers) {
     free(routers); // Free routers * 8 Bytes
     return 0;
 }
+
+// Delete - Slette ruter
+// satt inn i hovedfil
+void delete(int routers, int id){
+  if (find_router(routers, id) == NULL){
+    printf("Router: %d does not exist.\n", id);
+    return;
+  }
+
+  struct router* routerPointer = find_router(routers, id);
+
+  for(int i = 0; i < routers; i++){
+    if (routerPointer[i]->id == id){
+      routerPointer[i] = NULL;
+    }
+  }
+}
+
+
+
+/*
+// Free Memory - free allocated memory to avoid leaks
+void free_memory(int routers) {
+  for(int i = 0; i < routers; i++) {
+      if (routerPointer[i] != NULL){
+        free(routerPointer[i]); // Free 256 Bytes
+        routerPointer = NULL;
+      }
+    }
+    free(routerPointer); // Free routers * 8 Bytes
+    return;
+}
+*/
