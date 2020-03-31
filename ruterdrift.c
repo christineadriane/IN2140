@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
   // allocate space for router pointers
   routerPointer = malloc((sizeof(struct router*)) * routers); //8 * routers byte
 
-  int i;
+  int i = 0;
   for (i = 0; i < routers; i++){
     read(myFile, i);
   }
@@ -88,6 +88,11 @@ int main(int argc, char const *argv[]) {
     if(strcmp(string, "sett_flag") == 0){
       string = strtok(NULL, "\n");
     }
+
+    // route?
+    if(strcmp(string, "finnes_rute") == 0){
+      string = strtok(NULL, "\n");
+    }
   }
   // close file
   fclose(newFile);
@@ -98,17 +103,19 @@ int main(int argc, char const *argv[]) {
     perror("Nej");
     return EXIT_FAILURE;
   }
+
   // If there is a new number of routers after some is deleted.
-  int newRouters;
-  int a;
+  int newRouters = 0;
+  int a = 0;
   for(a = 0; a < routers; a++){
     struct router* r = routerPointer[a];
     if (r != NULL){
       newRouters++;
     }
   }
+
   // write the first 4 bytes with number of routers
-  fwrite(&newRouters, sizeof(int), 1, myFile);
+  fwrite(&newRouters, sizeof(int), 1, test);
 
   // write information about the routers
   for(a = 0; a < routers; a++){
@@ -119,6 +126,21 @@ int main(int argc, char const *argv[]) {
       fwrite(&r->mLenght, sizeof(char), 1, test);
       fwrite(&r->model, routerPointer[a]->mLenght - sizeof(char), 1, test);
       fwrite("\n", sizeof(char), 1, test);
+    }
+  }
+
+  // write information about connecting routers
+  for(a = 0; a < newRouters; a++){
+    struct router* r = routerPointer[a];
+    if (r != NULL){
+      int b;
+      for(b = 0; b < r->nCounter; b++){
+        if((r->nList[b]) != NULL){
+          fwrite(&r->id, sizeof(int), 1, test);
+          fwrite(&r->nList[b]->id, sizeof(int), 1, test);
+          fwrite("\n", sizeof(char), 1, test);
+        }
+      }
     }
   }
   // closing the test file
@@ -137,6 +159,7 @@ void read(FILE *myFile, int n){
   fread(&rp -> flag, sizeof(char), 1, myFile);
   fread(&rp -> mLenght, sizeof(char), 1, myFile);
   fread(&rp -> model, rp -> mLenght + 1, 1, myFile);
+  rp->nCounter = 0;
 
   /*  Tester print
   printf("Model: %s\n", rp -> model);
@@ -152,9 +175,9 @@ void read(FILE *myFile, int n){
 // reading and adding connections
 // also increased neighbour counter
 void read_connections(FILE* myFile, int routers){
-  unsigned int ru1;
-  unsigned int ru2;
-  unsigned int nullByte;
+  unsigned int ru1 = 0;
+  unsigned int ru2 = 0;
+  unsigned int nullByte = 0;
 
   long start = ftell(myFile);
   fseek(myFile, 0, SEEK_END);
@@ -196,11 +219,13 @@ struct router* find_router(int routers, int id){
 // Free Memory - free allocated memory to avoid leaks
 void free_memory(int routers) {
   int i;
-  for(i = 0; i < routers; i++) {
+  for(i = 0; i < routers - 1; i++) {
     struct router* r = routerPointer[i];
       if (r != NULL) {
         free(r); // Free 256 Bytes
-        r = NULL;
+      }
+      else{
+        printf("%d already freed", i);
       }
     }
     free(routerPointer); // Free routers * 8 Bytes
@@ -255,7 +280,7 @@ void print(int routers, int id){
   printf("ID: %d\n", routerPointer -> id );
   //printf("Flag: %d\n", routerPointer -> flag);
   printf("Flag: ");
-  binary_print(routerPointer->flag);
+  bit_print(routerPointer->flag);
 
   printf("\nNeighbours:\n");
 
@@ -292,6 +317,7 @@ void delete(int routers, int id){
   int l;
   for(l = 0; l < routers -1; l++){
     if(routerPointer[l]->id == id){
+      free(routerPointer[l]);
       break;
     }
   }
@@ -302,7 +328,7 @@ void delete(int routers, int id){
   printf("Deleted router: %d\n", id);
 }
 
-void binary_print(char b){
+void bit_print(char b){
   int i;
   for (i = 7; i >= 0; i--){
     printf("%d", (b >> i) & 0x01);
