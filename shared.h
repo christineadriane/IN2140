@@ -1,10 +1,11 @@
+/* header */
 #ifndef MY_SHARED_HEADER
 #define MY_SHARED_HEADER
 
 /* includes */
 #include <stdio.h>
 #include <string.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 /* declarations */
 void read();
@@ -14,6 +15,7 @@ void free_memory();
 void set_model();
 void add_connection();
 void delete();
+void binary_print(char b);
 void print();
 
 #endif
